@@ -4,6 +4,7 @@ using FluenValidationTesting.Models;
 using FluenValidationTesting.Validators;
 using FluenValidationTesting.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -16,9 +17,19 @@ namespace FluenValidationTesting.Controllers
     public class ValuesController : ControllerBase
     {
         // POST api/<ValuesController>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ValueInput value)
+        [HttpPost, Route("")]
+        public async Task<IActionResult> Post([FromBody] ValueInput value, string a, int b, bool c, decimal d)
         {
+            // custom validation service
+            ValidationBuilderResponse response = new ValidationBuilderResponse();
+
+            // build input dictionary with all url parameters
+            IDictionary<string, object> inp = new Dictionary<string,object>();
+            inp.Add("a", a);
+            inp.Add("b", b);
+            inp.Add("c", c);
+            response.ValidateUrlParameters(inp);
+
             // throw custom exception
             throw new CustomException($"{EnumHelper.GetEnumDescription(CustomInternalErrors.ErrorOne)}",
                     CustomInternalErrors.ErrorOne,
@@ -29,8 +40,7 @@ namespace FluenValidationTesting.Controllers
             ValueInputValidator validator = new ValueInputValidator();
             //validate
             ValidationResult results = validator.Validate(value);
-            // custom validation service
-            ValidationBuilderResponse response = new ValidationBuilderResponse();
+            
             response.ValidateModel(results);
 
             return Ok();
