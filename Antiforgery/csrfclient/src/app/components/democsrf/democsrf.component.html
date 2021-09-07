@@ -1,0 +1,9 @@
+<h1>Demo CSRF</h1>
+
+<button (click)="requestCSRFToken()">Request token!</button>
+
+<br>
+CSRF token: {{csrf}}
+
+<br>
+<button (click)="postWithCSRFToken()">POST action!</button>

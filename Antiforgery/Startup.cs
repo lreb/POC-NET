@@ -29,6 +29,27 @@ namespace Antiforgery
         public void ConfigureServices(IServiceCollection services)
         {
 
+            string[] origins = new string[] { "http://localhost:4200", "http://localhost:4201" };
+
+            string[] methods = new string[] { "GET", "POST", "DELETE" };
+
+            services.AddCors(o => o.AddPolicy("CorePolicy", builder =>
+            {
+                builder
+                .SetIsOriginAllowed(origin => true)
+                //.WithOrigins(origins)
+                .AllowAnyHeader()
+                .AllowAnyMethod() //.WithMethods(methods)
+                .AllowCredentials(); // <<< this is required for cookies to be set on the client - sets the 'Access-Control-Allow-Credentials' to true
+            }));
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -40,8 +61,15 @@ namespace Antiforgery
             /// enabled CSRF token validation in AspNet Core.
             services.AddAntiforgery(options => 
             {
+                options.Cookie.Name = "AntiForgeryCookie";
                 options.HeaderName = "X-XSRF-TOKEN";
-                options.Cookie.Name = "MyAntiForgeryCookieName";
+
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // make secure the cookie
+
+                options.Cookie.HttpOnly = false;
+                options.Cookie.IsEssential = true;
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.Path = "/";
             }).AddMvc();
 
 
@@ -60,6 +88,16 @@ namespace Antiforgery
             /// SERVICE
             /// set a cookie, with the token value, so that it can process the request
             app.UseAntiforgeryToken();
+
+            
+
+            app.UseCors("CorePolicy"); //Tried to put this first line too, but no luck
+
+            //app.UseCors(x => x
+            ////.WithOrigins(origins)
+            //.AllowAnyOrigin()
+            //.AllowAnyMethod()
+            //.AllowAnyHeader());
 
             app.UseHttpsRedirection();
 

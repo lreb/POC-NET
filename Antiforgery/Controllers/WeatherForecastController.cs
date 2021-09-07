@@ -42,7 +42,22 @@ namespace Antiforgery.Controllers
         [ValidateAntiForgeryToken] //will validate every request
         public IActionResult Save(PostObject value)
         {
-            return Content($"Executed Post Save action method: {value.Number}");
+            return Ok(new { message = $"Executed Post Save action method: {value.Number}" });
+        }
+
+        [HttpPut]
+        [ValidateAntiForgeryToken] //will validate every request
+        public IActionResult Update(PostObject value)
+        {
+            return Ok(new { message = $"Executed PUT action method: {value.Number}" });
+        }
+
+
+        [HttpDelete]
+        [ValidateAntiForgeryToken] //will validate every request
+        public IActionResult Delete(PostObject value)
+        {
+            return Ok(new { message = $"Executed DELETE action method: {value.Number}" });
         }
     }
 
