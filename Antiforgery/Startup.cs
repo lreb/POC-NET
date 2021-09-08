@@ -30,8 +30,8 @@ namespace Antiforgery
             services.AddCors(o => o.AddPolicy("CorePolicy", builder =>
             {
                 builder
-                .SetIsOriginAllowed(origin => true)
-                //.WithOrigins(origins)
+                //.SetIsOriginAllowed(origin => true)
+                .WithOrigins(origins)
                 .AllowAnyHeader()
                 .AllowAnyMethod() //.WithMethods(methods)
                 .AllowCredentials(); // <<< this is required for cookies to be set on the client - sets the 'Access-Control-Allow-Credentials' to true
