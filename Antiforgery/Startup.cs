@@ -2,17 +2,11 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Antiforgery
 {
@@ -61,7 +55,9 @@ namespace Antiforgery
             /// enabled CSRF token validation in AspNet Core.
             services.AddAntiforgery(options => 
             {
+                // If an explicit Name is not provided, the system will automatically generate a unique name that begins with DefaultCookiePrefix.
                 options.Cookie.Name = "AntiForgeryCookie";
+                // The name of the header used by the antiforgery system. If null, the system considers only form data.
                 options.HeaderName = "X-XSRF-TOKEN";
 
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // make secure the cookie
@@ -70,7 +66,10 @@ namespace Antiforgery
                 options.Cookie.IsEssential = true;
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.Path = "/";
-            }).AddMvc();
+            }).AddMvc(options=> 
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
 
 
         }
@@ -88,25 +87,16 @@ namespace Antiforgery
             /// SERVICE
             /// set a cookie, with the token value, so that it can process the request
             app.UseAntiforgeryToken();
-
-            
+            //app.UseAntiforgeryTokensValidation();
 
             app.UseCors("CorePolicy"); //Tried to put this first line too, but no luck
-
-            //app.UseCors(x => x
-            ////.WithOrigins(origins)
-            //.AllowAnyOrigin()
-            //.AllowAnyMethod()
-            //.AllowAnyHeader());
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
-
-          
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

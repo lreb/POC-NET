@@ -8,7 +8,7 @@ namespace Antiforgery.Controllers
 {
     [ApiController]
     // [AutoValidateAntiforgeryToken] //only validate the action method of type 'POST', it will automatically skip validation for methods like 'GET', 'OPTIONS', 'TRACE', etc.
-    // [ValidateAntiForgeryToken] // validate all http verbs
+    //[ValidateAntiForgeryToken] //will validate every request
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -25,7 +25,6 @@ namespace Antiforgery.Controllers
         }
 
         [HttpGet]
-        //[IgnoreAntiforgeryToken] // avoid to perform Validate AntiForgery Token
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
@@ -39,14 +38,12 @@ namespace Antiforgery.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] //will validate every request
         public IActionResult Save(PostObject value)
         {
             return Ok(new { message = $"Executed Post Save action method: {value.Number}" });
         }
 
         [HttpPut]
-        [ValidateAntiForgeryToken] //will validate every request
         public IActionResult Update(PostObject value)
         {
             return Ok(new { message = $"Executed PUT action method: {value.Number}" });
@@ -54,7 +51,6 @@ namespace Antiforgery.Controllers
 
 
         [HttpDelete]
-        [ValidateAntiForgeryToken] //will validate every request
         public IActionResult Delete(PostObject value)
         {
             return Ok(new { message = $"Executed DELETE action method: {value.Number}" });
